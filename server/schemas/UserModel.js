@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const blogModel = require("./BlogModel");
 const PasswordValidator = require("password-validator");
-const { cloudinary } = require("../utils/cloudinary");
+
 const userSchema = new mongoose.Schema(
 	{
 		username: {
@@ -46,19 +45,19 @@ userSchema.statics.validateUserThroughEmail = async function (email, password) {
 	return isValid ? foundUser : false;
 };
 
-//get username from userId
-userSchema.statics.getUsername = async function (userId) {
-	const user = await this.findById(userId);
-	if (user) return user.username;
-	else return null;
-};
+// //get username from userId
+// userSchema.statics.getUsername = async function (userId) {
+// 	const user = await this.findById(userId);
+// 	if (user) return user.username;
+// 	else return null;
+// };
 
-//does user exist?
-userSchema.statics.doesUserExist = async function (username) {
-	const user = await this.find({ username: username });
-	if (user.length) return true;
-	else return false;
-};
+// //does user exist?
+// userSchema.statics.doesUserExist = async function (username) {
+// 	const user = await this.find({ username: username });
+// 	if (user.length) return true;
+// 	else return false;
+// };
 
 var validator = new PasswordValidator();
 validator.min(8).max(100);
@@ -79,32 +78,35 @@ userSchema.pre("save", async function (next) {
 	next();
 });
 
-userSchema.statics.getPublicInfo = async function (user) {
-	let { username, profilePic, displayName, bio, _id } = user;
-	let userId = _id;
-	//now get url from public id
-	profilePic = cloudinary.url(profilePic);
-	return { username, profilePic, displayName, bio, userId };
-};
+// userSchema.statics.getPublicInfo = async function (user) {
+// 	let { username, profilePic, displayName, bio, _id } = user;
+// 	let userId = _id;
+// 	//now get url from public id
+// 	profilePic = cloudinary.url(profilePic);
+// 	return { username, profilePic, displayName, bio, userId };
+// };
 
-userSchema.statics.getPersonalInfo = async function (user) {
-	let { username, profilePic, displayName, bio, email, _id } = user;
-	let userId = _id;
-	profilePic = cloudinary.url(profilePic);
-	return { username, profilePic, displayName, bio, email, userId };
-};
+// userSchema.statics.getPersonalInfo = async function (user) {
+// 	let { username, profilePic, displayName, bio, email, _id } = user;
+// 	let userId = _id;
+// 	profilePic = cloudinary.url(profilePic);
+// 	return { username, profilePic, displayName, bio, email, userId };
+// };
 
-userSchema.post(
-	"deleteOne",
-	{ document: true, query: false },
-	async function () {
-		const blogs = await blogModel.find({ userId: this._id });
-		Promise.all(
-			blogs.forEach((b) => {
-				b.deleteOne();
-			})
-		);
-	}
-);
+/// to be moved
+// userSchema.post(
+// 	"deleteOne",
+// 	{ document: true, query: false },
+// 	async function () {
+// 		const blogs = await blogModel.find({ userId: this._id });
+// 		Promise.all(
+// 			blogs.forEach((b) => {
+// 				b.deleteOne();
+// 			})
+// 		);
+// 	}
+// );
+//************************************** */
+
 const userModel = mongoose.model("User", userSchema);
 module.exports = userModel;

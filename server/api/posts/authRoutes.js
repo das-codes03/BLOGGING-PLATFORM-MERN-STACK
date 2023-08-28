@@ -1,12 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const regModel = require("../../schemas/RegisterConfirmationModel");
+
 const {
 	getToken,
 	activateUser,
 	getEmailToken,
 	authenticateRequest,
 } = require("../AuthHandler");
+const {
+	deleteUser,
+	isEmailTaken,
+	isUsernameTaken,
+	putInRegistration,
+} = require("../../schemas/Controller");
+
 const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
 	service: "gmail",
@@ -30,29 +37,13 @@ router.post("/login", (req, res) => {
 		});
 });
 
-const userModel = require("../../schemas/UserModel");
-
-router.delete("/:userId", authenticateRequest, async (req, res) => {
-	if (req.userId !== req.params.userId) return res.sendStatus(403);
+router.delete("/delete", authenticateRequest, async (req, res) => {
 	try {
-		userModel
-			.findById(req.userId)
-			.then((user) => {
-				user
-					.deleteOne()
-					.then(() => {
-						return res.sendStatus(200);
-					})
-					.catch((e) => {
-						console.log(e);
-						return res.sendStatus(500);
-					});
-			})
-			.catch(() => {
-				return res.sendStatus(404);
-			});
+		await deleteUser(req.userId);
+		return res.sendStatus(200);
 	} catch (e) {
-		res.sendStatus(500);
+		console.log(e);
+		return res.sendStatus(400);
 	}
 });
 router.get("/activate/:token", async (req, res) => {
@@ -62,58 +53,49 @@ router.get("/activate/:token", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-	let { username, password, email, name } = req.body;
-	email = email.trim();
-	email = email.toLowerCase();
+	try {
+		let { username, password, email, name } = req.body;
+		email = email.trim();
+		email = email.toLowerCase();
 
-	username = username.trim();
-	username = username.toLowerCase();
-	//first check if email is already used
-	if (
-		(await regModel.exists({ email: email })) ||
-		(await userModel.exists({ email: email }))
-	) {
-		return res
-			.status(409)
-			.send("Oh no! That email is already taken. Please use a different one.");
-	}
-	//check if username is already taken
-	if (
-		(await regModel.exists({ username: username })) ||
-		(await userModel.exists({ username: username }))
-	) {
-		return res
-			.status(409)
-			.send(
-				"Oops! Someone's already using that username. Please choose another."
-			);
-	}
-	const token = await getEmailToken(username, password, email, name);
+		username = username.trim();
+		username = username.toLowerCase();
+		//first check if email is already used
+		if (await isEmailTaken(email)) {
+			return res
+				.status(409)
+				.send(
+					"Oh no! That email is already in use. Please use a different one."
+				);
+		}
+		//check if username is already taken
+		if (await isUsernameTaken(username)) {
+			return res
+				.status(409)
+				.send(
+					"Oops! Someone's already using that username. Please choose another."
+				);
+		}
 
-	const mailOptions = {
-		from: "dasarghadeep2003@gmail.com",
-		to: email,
-		subject: "[Activation Link]",
-		html: `<p>Click <a href="http://localhost:3000/api/auth/activate/${token}">here</a> to activate your account</p>`,
-	};
-	//now put in database
-	new regModel({ username, email })
-		.save()
-		.then(() => {
-			transporter.sendMail(mailOptions, (error, info) => {
-				error &&
-					(() => {
-						return res.sendStatus(500);
-					})();
-				info &&
-					(() => {
-						return res.sendStatus(200);
-					})();
-			});
-		})
-		.catch(() => {
-			res.sendStatus(500);
+		//get email token
+		const token = await getEmailToken(username, password, email, name);
+
+		//TODO: put in seperate function
+		const mailOptions = {
+			from: "dasarghadeep2003@gmail.com",
+			to: email,
+			subject: "[Activation Link]",
+			html: `<p>Click <a href="http://localhost:3000/api/auth/activate/${token}">here</a> to activate your account</p>`,
+		};
+		//now put in database
+		await putInRegistration(username, email);
+		return transporter.sendMail(mailOptions, (error, info) => {
+			error && res.sendStatus(500);
+			info && res.sendStatus(200);
 		});
+	} catch (e) {
+		return res.sendStatus(400);
+	}
 });
 
 module.exports = router;

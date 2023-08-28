@@ -94,20 +94,8 @@ export default function ViewBlogPage() {
 		axios
 			.get(`http://localhost:3000/api/blogs/${blogId}`)
 			.then((e) => {
-				console.log(e.data);
-
-				//now get User info
-				axios
-					.get(`http://localhost:3000/api/users/id/${e.data.userId}`)
-					.then((res) => {
-						setContent((d) => {
-							return { ...d, ...res.data };
-						});
-					});
-
-				console.log(e.data);
 				setContent((d) => {
-					return { ...d, ...e.data };
+					return { ...e.data };
 				});
 				setIsLiked(e.data.hasLiked);
 			})
@@ -132,14 +120,15 @@ export default function ViewBlogPage() {
 	}, [user, response]);
 	const commentCards = [];
 	comments.forEach((c) => {
+		console.log(c);
 		commentCards.push(
 			<CommentBox
 				data={{ ...c, blogId: blogId }}
 				onDelete={() => {
-					deleteComment(c._id);
+					deleteComment(c.commentId);
 				}}
 				sendComment={sendComment}
-				key={c._id}
+				key={c.commentId}
 			/>
 		);
 	});
@@ -154,9 +143,13 @@ export default function ViewBlogPage() {
 			)
 			.then((res) => {
 				commentRef.current.value = "";
-				setComments((c) => {
-					return [res.data, ...c];
-				});
+				axios
+					.get(`http://localhost:3000/api/blogs/${blogId}/comments/${res.data}`)
+					.then((res2) => {
+						setComments((c) => {
+							return [res2.data, ...c];
+						});
+					});
 				showMessage("Comment posted successfully!", "success");
 			})
 			.catch((e) => {
@@ -170,7 +163,7 @@ export default function ViewBlogPage() {
 			.then(() => {
 				setComments((c) => {
 					return c.filter((e) => {
-						return e._id != id;
+						return e.commentId != id;
 					});
 				});
 			})

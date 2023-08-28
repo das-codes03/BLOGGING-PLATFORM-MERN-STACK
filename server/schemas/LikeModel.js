@@ -12,18 +12,18 @@ const likeSchema = new mongoose.Schema({
 	},
 });
 
-likeSchema.statics.hasLiked = async function (contentId, userId) {
-	return (await this.exists({
-		contentId: contentId,
-		userId: userId,
-	}))
-		? true
-		: false;
-};
+// likeSchema.statics.hasLiked = async function (contentId, userId) {
+// 	return (await this.exists({
+// 		contentId: contentId,
+// 		userId: userId,
+// 	}))
+// 		? true
+// 		: false;
+// };
 
-likeSchema.statics.likeCount = async function (contentId) {
-	return await this.count({ contentId });
-};
+// likeSchema.statics.likeCount = async function (contentId) {
+// 	return await this.count({ contentId });
+// };
 
 const likeModel = mongoose.model("Like", likeSchema);
 module.exports = likeModel;

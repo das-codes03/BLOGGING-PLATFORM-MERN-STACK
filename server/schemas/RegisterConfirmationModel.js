@@ -15,5 +15,5 @@ const regSchema = new mongoose.Schema(
 );
 regSchema.index({ createdAt: 1 }, { expires: "1d" });
 
-const RegistrationModel = mongoose.model("RegistrationPending", regSchema);
-module.exports = RegistrationModel;
+const registrationModel = mongoose.model("RegistrationPending", regSchema);
+module.exports = registrationModel;

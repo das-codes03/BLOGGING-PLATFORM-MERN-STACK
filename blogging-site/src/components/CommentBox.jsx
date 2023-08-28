@@ -25,12 +25,42 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import LikeButton from "./LikeButton";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function CommentBox({ data, onDelete, onLike, sendComment }) {
+export default function CommentBox({ data, onDelete, sendComment }) {
 	console.log(data);
 	const [replyInputOpen, setReplyInput] = useState(false);
+	const [replies, setReplies] = useState([]);
+	const [repliesOpen, setRepliesOpen] = useState(false);
 	const contentRef = useRef();
+
+	useEffect(() => {
+		if (!repliesOpen) {
+			setReplies([]);
+			return;
+		}
+
+		axios
+			.get(
+				`http://localhost:3000/api/blogs/${data.blogId}/comments/${data.commentId}/replies`
+			)
+			.then((res) => {
+				setReplies((reps) => {
+					return res.data;
+				});
+			});
+	}, [repliesOpen]);
+	const replycards = replies.map((r) => {
+		console.log(r);
+		return (
+			<CommentBox
+				data={r}
+				onDelete={() => {}}
+				key={r.commentId}
+				sendComment={sendComment}
+			/>
+		);
+	});
 	return (
 		<Box marginLeft={data.repliedToId ? "50px" : 0}>
 			<Card sx={{ margin: "10px", padding: "10px" }}>
@@ -58,9 +88,8 @@ export default function CommentBox({ data, onDelete, onLike, sendComment }) {
 					<LikeButton
 						isLiked={data.hasLiked}
 						likeCount={data.likeCount}
-						likeURL={`http://localhost:3000/api/blogs/${data.blogId}/comments/${data._id}/like`}
-						unlikeURL={`http://localhost:3000/api/blogs/${data.blogId}/comments/${data._id}/unlike`}
-						onClick={onLike}
+						likeURL={`http://localhost:3000/api/blogs/${data.blogId}/comments/${data.commentId}/like`}
+						unlikeURL={`http://localhost:3000/api/blogs/${data.blogId}/comments/${data.commentId}/unlike`}
 					/>
 
 					{(JSON.parse(localStorage.getItem("auth")) || {}).userId ===
@@ -76,6 +105,15 @@ export default function CommentBox({ data, onDelete, onLike, sendComment }) {
 					>
 						{!replyInputOpen ? <Reply /> : <Cancel />}
 					</IconButton>
+					{!data.repliedToId && (
+						<Button
+							onClick={() => {
+								setRepliesOpen((c) => !c);
+							}}
+						>
+							{data.replyCount} Replies
+						</Button>
+					)}
 				</CardActions>
 			</Card>
 			{replyInputOpen && (
@@ -89,13 +127,16 @@ export default function CommentBox({ data, onDelete, onLike, sendComment }) {
 							multiline
 						></TextField>
 						<IconButton
-							onClick={() => sendComment(data._id, contentRef.current.value)}
+							onClick={() =>
+								sendComment(data.commentId, contentRef.current.value)
+							}
 						>
 							<Send />
 						</IconButton>
 					</Box>
 				</Box>
 			)}
+			{replycards}
 		</Box>
 	);
 }

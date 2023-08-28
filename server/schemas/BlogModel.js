@@ -21,22 +21,26 @@ const blogSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-blogSchema.post(
-	"deleteOne",
-	{ document: true, query: false },
-	async function () {
-		const comments = await commentModel.find({ blogId: this._id });
+blogSchema.statics.prepareData = async function (blog) {};
 
-		comments.forEach(async (c) => {
-			return await c.deleteOne();
-		});
+//TO BE MOVED..........................
+// blogSchema.post(
+// 	"deleteOne",
+// 	{ document: true, query: false },
+// 	async function () {
+// 		const comments = await commentModel.find({ blogId: this._id });
 
-		const likes = await likeModel.find({ contentId: this._id });
+// 		comments.forEach(async (c) => {
+// 			return await c.deleteOne();
+// 		});
 
-		likes.forEach(async (l) => {
-			return await l.deleteOne();
-		});
-	}
-);
+// 		const likes = await likeModel.find({ contentId: this._id });
+
+// 		likes.forEach(async (l) => {
+// 			return await l.deleteOne();
+// 		});
+// 	}
+// );
+//************************************************* */
 const blogModel = mongoose.model("Blog", blogSchema);
 module.exports = blogModel;

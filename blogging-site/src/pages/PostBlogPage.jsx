@@ -174,7 +174,7 @@ export default function PostBlogPage() {
 						axios
 							.post("http://localhost:3000/api/blogs", data)
 							.then((res) => {
-								navigate(`../blogs/${res.data._id}`);
+								navigate(`../blogs/${res.data}`);
 							})
 							.catch((e) => {
 								alert("Error: " + e);

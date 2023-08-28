@@ -13,7 +13,7 @@ export default function EditProfileForm() {
 
 	useEffect(() => {
 		axios
-			.get(`http://localhost:3000/api/users/me/getInfo`)
+			.get(`http://localhost:3000/api/users/me`)
 			.then((res) => {
 				console.log(res.data);
 				setUserInfo(res.data);
@@ -23,7 +23,7 @@ export default function EditProfileForm() {
 	const [msgBox, showMessage] = useShowMessage();
 	function Update() {
 		axios
-			.patch(`http://localhost:3000/api/users/id/${sensitiveInfo.userId}`, {
+			.patch(`http://localhost:3000/api/users/`, {
 				bio: bioRef.current.value,
 				displayName: displayNameRef.current.value,
 				profilePic: sensitiveInfo.newProfilePic,
