@@ -20,6 +20,7 @@ router.get("/", async (req, res) => {
 		const comments = await getComments(req.blogId, req.userId);
 		return res.status(200).send(comments);
 	} catch (e) {
+		console.log(e);
 		return res.sendStatus(404);
 	}
 });
@@ -68,7 +69,7 @@ router.post("/", authenticateRequest, async (req, res) => {
 //reply to a comment in a blog
 router.post("/:commentId", authenticateRequest, async (req, res) => {
 	try {
-		const c_id = postComment(
+		const c_id = await postComment(
 			req.userId,
 			req.blogId,
 			req.body,

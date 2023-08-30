@@ -17,30 +17,14 @@ const blogSchema = new mongoose.Schema(
 			type: Array,
 			required: true,
 		},
+		readingTime: {
+			type: Number,
+		},
 	},
 	{ timestamps: true }
 );
 
 blogSchema.statics.prepareData = async function (blog) {};
 
-//TO BE MOVED..........................
-// blogSchema.post(
-// 	"deleteOne",
-// 	{ document: true, query: false },
-// 	async function () {
-// 		const comments = await commentModel.find({ blogId: this._id });
-
-// 		comments.forEach(async (c) => {
-// 			return await c.deleteOne();
-// 		});
-
-// 		const likes = await likeModel.find({ contentId: this._id });
-
-// 		likes.forEach(async (l) => {
-// 			return await l.deleteOne();
-// 		});
-// 	}
-// );
-//************************************************* */
 const blogModel = mongoose.model("Blog", blogSchema);
 module.exports = blogModel;

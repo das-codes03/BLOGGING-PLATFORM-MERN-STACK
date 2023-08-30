@@ -39,7 +39,7 @@ router.get("/:username", async (req, res) => {
 	}
 });
 
-//update profile...TODO
+//update profile...
 router.patch("/", authenticateRequest, async (req, res) => {
 	try {
 		const data = req.body;

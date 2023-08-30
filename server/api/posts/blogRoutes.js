@@ -4,11 +4,11 @@ const router = express.Router();
 const {
 	getBlog,
 	sendLike,
-	deleteLike,
 	unlike,
 	postBlog,
 	deleteBlog,
 	getBlogs,
+	updateBlog,
 } = require("../../schemas/Controller");
 
 const comments = require("../../api/posts/commentRoute");
@@ -53,6 +53,19 @@ router.post("/", authenticateRequest, async (req, res) => {
 		const b = await postBlog(req.userId, post);
 		return res.status(200).send(b);
 	} catch (e) {
+		console.log(e);
+		return res.sendStatus(400);
+	}
+});
+
+//Edit a blog
+router.put("/:blogId/edit", authenticateRequest, async (req, res) => {
+	try {
+		const post = req.body;
+		const b = await updateBlog(req.userId, req.params.blogId, post);
+		return res.status(200).send(b);
+	} catch (e) {
+		console.log(e);
 		return res.sendStatus(400);
 	}
 });
@@ -89,8 +102,10 @@ router.get("/", async (req, res) => {
 		const perpage = Math.min(req.query.perpage || 10, 100);
 
 		const blogs = await getBlogs(req.userId, pageno, perpage, filterbyuserid);
+
 		return res.status(200).send(blogs);
 	} catch (e) {
+		console.log(e);
 		return res.sendStatus(404);
 	}
 });

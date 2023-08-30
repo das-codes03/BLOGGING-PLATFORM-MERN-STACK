@@ -2,6 +2,8 @@
 // This contains procedures for deletion of dependent documents
 // aka CASCADE DELETE
 
+const readingTime = require("reading-time");
+
 const { cloudinary } = require("../utils/cloudinary");
 const blogModel = require("./BlogModel");
 const commentModel = require("./CommentModel");
@@ -40,24 +42,30 @@ async function updateUserProfile(userId, data) {
 	let displayName = data.displayName || null;
 	// let { profilePic, bio, displayName } = req.body;
 	const user = await userModel.findById(userId);
-
+	const updatedData = {};
+	bio && (updatedData.bio = bio);
+	displayName && (updatedData.displayName = displayName);
 	//process new profile pic
 	if (profilePic) {
-		const uploadResponse = await cloudinary.uploader.upload(profilePic, {
-			upload_preset: "ml_default",
-		});
-		if (user.profilePic) {
-			//now get old image id and remove from cloudinary
-			await cloudinary.uploader.destroy(user.profilePic);
+		if (profilePic == "remove") {
+			updatedData.profilePic = null;
+			if (user.profilePic) {
+				//now get old image id and remove from cloudinary
+				await cloudinary.uploader.destroy(user.profilePic);
+			}
+		} else {
+			const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+				upload_preset: "ml_default",
+			});
+			updatedData.profilePic = uploadResponse.public_id;
+			if (user.profilePic) {
+				//now get old image id and remove from cloudinary
+				await cloudinary.uploader.destroy(user.profilePic);
+			}
 		}
-		profilePic = uploadResponse.public_id;
 	}
 
 	//pack data
-	const updatedData = {};
-	profilePic && (updatedData.profilePic = profilePic);
-	bio && (updatedData.bio = bio);
-	displayName && (updatedData.displayName = displayName);
 	await user.updateOne(updatedData);
 	return user._id;
 }
@@ -99,6 +107,7 @@ async function postBlog(userId, data) {
 	//check if user is real
 	if (!(await userModel.exists({ _id: userId })))
 		throw new Error("User doesn't exist");
+
 	const b = await new blogModel({
 		title: data.title,
 		userId: userId,
@@ -106,7 +115,26 @@ async function postBlog(userId, data) {
 	}).save();
 	return b._id;
 }
+async function updateBlog(userId, blogId, data) {
+	//check if user is real
+	if (!(await userModel.exists({ _id: userId })))
+		throw new Error("User doesn't exist");
 
+	//find the existing blog
+	const blog = await blogModel.findById(blogId);
+	if (!blog) throw new Error("Blog doesn't exist");
+
+	//check if user and blog author is same
+	if (blog.userId != userId) throw new Error("Forbidden");
+
+	const b = await blog.updateOne({
+		title: data.title,
+		userId: userId,
+		content: data.content,
+	});
+
+	return blog._id;
+}
 async function putInRegistration(username, email) {
 	await new registrationModel({ username, email }).save();
 	return true;
@@ -195,7 +223,7 @@ async function getComments(blogId, reqUID) {
 	});
 
 	//process each comment
-	const data = await Promise.all(
+	let data = await Promise.all(
 		comments.map(async (c) => {
 			//count the number of likes
 			const likeCount = await likeModel.count({ contentId: c._id });
@@ -205,6 +233,7 @@ async function getComments(blogId, reqUID) {
 			const hasLiked = reqUID ? await userHasLiked(reqUID, c._id) : false;
 
 			//get user information
+
 			const user = await getPublicUserInfo(c.userId);
 
 			//pack data
@@ -221,7 +250,7 @@ async function getComments(blogId, reqUID) {
 			};
 		})
 	);
-
+	data = data.filter((c) => !null);
 	return data;
 }
 async function getPublicInfoByUsername(username) {
@@ -235,7 +264,9 @@ async function getPublicInfoByUsername(username) {
 }
 async function getPublicUserInfo(userId) {
 	//find the user
+
 	const user = await userModel.findById(userId);
+	if (!user) throw new Error("User doesn't exist.");
 	//generate profile pic URL from cloudinary public_id
 	const profilePicURL = user.profilePic
 		? cloudinary.url(user.profilePic)
@@ -311,9 +342,15 @@ async function getBlogs(reqUID, pageNo, perpage, filterByUID) {
 	const remaining = docLen - skip - blogs.length;
 	const hasMore = remaining ? true : false;
 
-	const data = await Promise.all(
+	let data = await Promise.all(
 		blogs.map(async (b) => {
-			const user = await getPublicUserInfo(b.userId);
+			let user;
+			try {
+				user = await getPublicUserInfo(b.userId);
+			} catch (e) {
+				console.log(e);
+				return null;
+			}
 			//count the number of likes
 			const likeCount = await likeModel.count({ contentId: b._id });
 
@@ -329,7 +366,7 @@ async function getBlogs(reqUID, pageNo, perpage, filterByUID) {
 			};
 		})
 	);
-
+	data = data.filter((b) => !null);
 	return { blogs: data, hasMore };
 }
 /**
@@ -410,11 +447,11 @@ async function deleteBlog(blogId, reqUID) {
 	return true;
 }
 
-//delete comment. Throws error if not found
+//delete comment
 async function deleteComment(commentId, reqUID) {
 	//find the comment
 	const comment = await commentModel.findById(commentId);
-
+	if (!comment) return;
 	//CHECK IF USER REQUESTING IS SAME AS AUTHOR OF COMMENT!
 	if (comment.userId != reqUID) throw new Error("Forbidden");
 
@@ -447,7 +484,7 @@ async function deleteComment(commentId, reqUID) {
 async function deleteLike(likeId, reqUID) {
 	//simple delete as no dependencies are there for likes
 	const like = await likeModel.findById(likeId);
-	console.log(like);
+
 	//CHECK IF USER REQUESTING IS SAME AS SENDER OF LIKE!
 	if (like.userId != reqUID) throw new Error("Forbidden");
 
@@ -467,17 +504,23 @@ async function isUsernameTaken(username) {
 
 //checks if email is taken from both pending registrations and active users
 async function isEmailTaken(email) {
-	return (
-		(await registrationModel.exists({ email: email })) ||
+	return (await registrationModel.exists({ email: email })) ||
 		(await userModel.exists({ email: email }))
-	);
+		? true
+		: false;
 }
 
+//check if email is used by active user
+async function isEmailActive(email) {
+	return (await userModel.exists({ email: email })) ? true : false;
+}
 module.exports = {
+	isEmailActive,
 	sendLike,
 	putInRegistration,
 	updateUserProfile,
 	unlike,
+	updateBlog,
 	postComment,
 	postBlog,
 	isUsernameTaken,
