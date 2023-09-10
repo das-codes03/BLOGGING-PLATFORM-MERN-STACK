@@ -20,7 +20,8 @@ export default function ProfilePicture({ src, maxHeight }) {
 					src={src}
 					style={{
 						width: "100%",
-						borderRadius: "50%",
+						borderRadius: "20%",
+						border: "solid black 5px",
 						aspectRatio: 1,
 						objectFit: "cover",
 						maxHeight: maxHeight,

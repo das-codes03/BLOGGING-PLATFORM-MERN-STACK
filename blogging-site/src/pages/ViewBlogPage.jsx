@@ -34,32 +34,85 @@ import LoginDialog from "../components/LoginDialog";
 import useShowMessage from "./hooks/useShowMessage";
 
 function ViewPort({ data }) {
-	console.log(data);
-
 	return (
 		<Box
-			sx={{ padding: "1em", margin: "1em" }}
+			maxWidth={"100vw"}
+			sx={{ padding: "1em", margin: "1em", userSelect: "none" }}
 			display={"flex"}
 			alignItems={"center"}
 			flexDirection={"column"}
 		>
-			<Box marginTop={"20px"} borderBottom="solid" borderColor={"divider"}>
-				<Typography fontSize={"2rem"} color={"primary"}>
+			<Box
+				marginTop={"20px"}
+				marginBottom={"10px"}
+				borderBottom="solid"
+				borderColor={"divider"}
+			>
+				<Typography
+					fontSize={"3rem"}
+					fontWeight={"bold"}
+					color={"textPrimary"}
+					fontFamily={"Barlow Condensed"}
+					sx={{ hyphens: "auto" }}
+				>
 					{data.title}
 				</Typography>
 			</Box>
-			<Typography marginBottom={"40px"}>
-				Posted on {"2nd March 2023"}
+			<Typography
+				marginBottom={"5px"}
+				fontWeight={"bold"}
+				color={"textSecondary"}
+			>
+				{new Date(data.createdAt).toLocaleString("en-GB", {
+					day: "numeric",
+					month: "short",
+					year: "numeric",
+				})}
+			</Typography>
+			<Typography
+				fontFamily={"Anton"}
+				marginBottom={"0px"}
+				color={"textSecondary"}
+			>
+				{data.displayName}
+			</Typography>
+			<Typography
+				color={"textSecondary"}
+				fontFamily={"Roboto"}
+				marginBottom={"20px"}
+				fontSize={"0.75em"}
+			>
+				@{data.username}
 			</Typography>
 			<Box maxWidth={"1000px"} alignItems={"center"}>
 				{(data.content || []).map((e, i) => {
 					return (
-						<Box key={i} marginBottom={"10px"}>
-							<Typography color={"secondary"} fontStyle={"oblique"}>
+						<Box key={i} marginBottom={"30px"}>
+							<Typography
+								color={"textPrimary"}
+								fontWeight={"bold"}
+								fontSize={"1.5em"}
+								marginBottom={"10px"}
+								fontFamily={"Barlow condensed"}
+							>
 								{e.subtitle}
 							</Typography>
-							<Typography textAlign={"justify"} fontSize={"18px"}>
+							<Typography
+								style={{
+									whiteSpace: "pre-line",
+									wordWrap: "break-word",
+									hyphens: "initial",
+								}}
+								textAlign={"justify"}
+								fontSize={"21px"}
+								marginBottom={"20px"}
+								fontFamily={"Roboto"}
+								fontWeight={"bold"}
+							>
 								{e.body}
+							</Typography>
+							<Typography textAlign={"center"} color={"textSecondary"}>
+								* * *
 							</Typography>
 						</Box>
 					);
@@ -85,7 +138,6 @@ export default function ViewBlogPage() {
 
 	function deleteBlog(id) {
 		axios.delete(`http://localhost:3000/api/blogs/${id}`).then(() => {
-			console.log("deleted");
 			navigate("/");
 		});
 	}
@@ -120,7 +172,6 @@ export default function ViewBlogPage() {
 	}, [user, response]);
 	const commentCards = [];
 	comments.forEach((c) => {
-		console.log(c);
 		commentCards.push(
 			<CommentBox
 				data={{ ...c, blogId: blogId }}
@@ -143,9 +194,11 @@ export default function ViewBlogPage() {
 			)
 			.then((res) => {
 				commentRef.current.value = "";
+				console.log(res.data);
 				axios
 					.get(`http://localhost:3000/api/blogs/${blogId}/comments/${res.data}`)
 					.then((res2) => {
+						if (res2.data.repliedToId) return;
 						setComments((c) => {
 							return [res2.data, ...c];
 						});
@@ -153,7 +206,6 @@ export default function ViewBlogPage() {
 				showMessage("Comment posted successfully!", "success");
 			})
 			.catch((e) => {
-				console.log(e);
 				showMessage("Couldn't post comment", "error");
 			});
 	}
@@ -172,7 +224,12 @@ export default function ViewBlogPage() {
 	return (
 		<>
 			<LoginDialog open={loginDialog} onClose={() => setLoginDialog(false)} />
-			<Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
+			<Box
+				maxWidth={"100vw"}
+				display={"flex"}
+				flexDirection={"column"}
+				alignItems={"center"}
+			>
 				<ViewPort data={response}></ViewPort>
 				<Box display="flex" alignItems="center" gap="30px">
 					<LikeButton
@@ -204,7 +261,13 @@ export default function ViewBlogPage() {
 							<IconButton onClick={() => setDeleteDialog(true)}>
 								<DeleteOutline />
 							</IconButton>
-							<Edit />
+							<IconButton
+								onClick={() => {
+									navigate("edit");
+								}}
+							>
+								<Edit />
+							</IconButton>
 						</>
 					)}
 				</Box>
@@ -220,7 +283,7 @@ export default function ViewBlogPage() {
 						<TextField
 							placeholder="Add a comment"
 							inputRef={commentRef}
-							sx={{ width: "100%" }}
+							sx={{ width: "100%", margin: "10px" }}
 							multiline
 						/>
 						<IconButton
@@ -232,11 +295,23 @@ export default function ViewBlogPage() {
 						</IconButton>
 					</div>
 				</Box>
-				<Box maxWidth={"1000px"} width={"100%"}>
-					{commentCards}
+				<Typography fontFamily={"anton"}>Comments</Typography>
+				<Box
+					maxWidth={"1000px"}
+					width={"100%"}
+					display={"flex"}
+					flexDirection={"column"}
+				>
+					{commentCards.length ? (
+						commentCards
+					) : (
+						<Typography alignSelf={"center"}>
+							Be the first one to comment!
+						</Typography>
+					)}
 				</Box>
 				<Dialog open={deleteDialog}>
-					<DialogTitle color={"orange"}>
+					<DialogTitle color={"error"}>
 						Caution: Unpublishing Ahead!
 					</DialogTitle>
 					<DialogContent>
@@ -246,7 +321,7 @@ export default function ViewBlogPage() {
 							disappearance, or could the pages of your creation still find a
 							home in the library of the internet?
 						</Typography>
-						<Typography color={"red"}>
+						<Typography color={"error"}>
 							Note: you cannot UNDO this action
 						</Typography>
 						<Input

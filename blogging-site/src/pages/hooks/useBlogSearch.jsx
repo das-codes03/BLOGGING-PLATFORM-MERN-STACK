@@ -2,8 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function useBlogSearch(pageno, filterbyuserid) {
-	console.log(filterbyuserid);
-
 	const [isLoading, setIsLoading] = useState(false);
 	const [hasMore, setHasMore] = useState(true);
 	const [blogs, setBlogs] = useState([]);
@@ -36,7 +34,7 @@ export default function useBlogSearch(pageno, filterbyuserid) {
 						ids.add(r.blogId);
 					});
 					//now we have unique ids
-					console.log(ids);
+
 					blog = [];
 					ids.forEach((i) => {
 						let src =

@@ -41,17 +41,21 @@ export default function HomePage() {
 
 	return (
 		<>
-			<section>
-				<Box
-					padding={"1em"}
-					display={"flex"}
-					justifyContent={"center"}
-					alignItems={"center"}
-					gap={"1em"}
-				>
-					<FormControl>
+			<Box
+				width={"100%"}
+				height={"100%"}
+				padding={"1em"}
+				display={"flex"}
+				justifyContent={"center"}
+				alignItems={"center"}
+				maxWidth={"1200px"}
+				flexDirection={"column"}
+				alignSelf={"center"}
+			>
+				{/* <FormControl>
 						<InputLabel id="demo-simple-select-label">Sort by</InputLabel>
 						<Select
+							variant="standard"
 							labelId="demo-simple-select-label"
 							id="demo-simple-select"
 							value={10}
@@ -63,14 +67,15 @@ export default function HomePage() {
 							<MenuItem value={30}>Hot</MenuItem>
 						</Select>
 					</FormControl>
-					<TextField label="search" sx={{ width: "50%" }} />
+					<TextField label="Search" variant="standard" sx={{ width: "50%" }} />
 					<IconButton sx={{ width: "2em", height: "2em" }}>
 						<Search />
-					</IconButton>
-				</Box>
-
+					</IconButton> */}
+				<Typography fontSize={"2em"} marginBottom={"10px"} fontFamily={"Anton"}>
+					Latest posts 🔍
+				</Typography>
 				<BlogSearchSection />
-			</section>
+			</Box>
 		</>
 	);
 }

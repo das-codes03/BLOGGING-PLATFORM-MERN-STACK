@@ -1,7 +1,10 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography, useMediaQuery } from "@mui/material";
 import useBlogSearch from "./hooks/useBlogSearch";
 import { useCallback, useRef, useState } from "react";
 import BlogCard from "../components/BlogCard";
+import { Masonry } from "@mui/lab";
+import { useTheme } from "@emotion/react";
+import { Search } from "@mui/icons-material";
 
 export default function BlogSearchSection({ userId }) {
 	const [pageno, setPageNo] = useState(0);
@@ -40,16 +43,29 @@ export default function BlogSearchSection({ userId }) {
 			/>
 		);
 	});
-	console.log(blogcards);
+
+	const theme = useTheme();
+
+	const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("lg"));
 	return (
 		<>
-			<Box display={"flex"} flexDirection={"column"}>
+			<Masonry columns={isSmallScreen ? 1 : 2}>
 				{/* List of blogs */}
 				{blogcards}
 				{blogcards.length == 0 ? (
-					<Typography textAlign={"center"}>No blogs found</Typography>
+					<Box display={"flex"} gap={"10px"} alignItems={"center"}>
+						<Typography
+							fontFamily={"Anton"}
+							sx={{ whiteSpace: "nowrap" }}
+							textAlign={"center"}
+							fontSize={"2em"}
+						>
+							No blogs found
+						</Typography>
+						<Search fontSize="large" />
+					</Box>
 				) : null}
-			</Box>
+			</Masonry>
 		</>
 	);
 }

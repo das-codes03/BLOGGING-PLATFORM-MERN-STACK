@@ -28,7 +28,6 @@ import LikeButton from "./LikeButton";
 import { useEffect, useRef, useState } from "react";
 
 export default function CommentBox({ data, onDelete, sendComment }) {
-	console.log(data);
 	const [replyInputOpen, setReplyInput] = useState(false);
 	const [replies, setReplies] = useState([]);
 	const [repliesOpen, setRepliesOpen] = useState(false);
@@ -51,7 +50,6 @@ export default function CommentBox({ data, onDelete, sendComment }) {
 			});
 	}, [repliesOpen]);
 	const replycards = replies.map((r) => {
-		console.log(r);
 		return (
 			<CommentBox
 				data={r}
@@ -77,12 +75,17 @@ export default function CommentBox({ data, onDelete, sendComment }) {
 						></Avatar>
 						<a href={`../user/${data.username}`}>
 							<Box display={"flex"} gap={"10px"}>
-								<Typography color={"secondary"}>{data.displayName}</Typography>
-								<Typography> @{data.username}</Typography>
+								<Typography color={"textPrimary"}>
+									{data.displayName}
+								</Typography>
+								<Typography color={"textSecondary"}>
+									{" "}
+									@{data.username}
+								</Typography>
 							</Box>
 						</a>
 					</Box>
-					<Typography>{data.content}</Typography>
+					<Typography sx={{ hyphens: "auto" }}>{data.content}</Typography>
 				</CardContent>
 				<CardActions>
 					<LikeButton
@@ -105,8 +108,9 @@ export default function CommentBox({ data, onDelete, sendComment }) {
 					>
 						{!replyInputOpen ? <Reply /> : <Cancel />}
 					</IconButton>
-					{!data.repliedToId && (
+					{!data.repliedToId && data.replyCount && (
 						<Button
+							color="info"
 							onClick={() => {
 								setRepliesOpen((c) => !c);
 							}}
@@ -127,9 +131,10 @@ export default function CommentBox({ data, onDelete, sendComment }) {
 							multiline
 						></TextField>
 						<IconButton
-							onClick={() =>
-								sendComment(data.commentId, contentRef.current.value)
-							}
+							onClick={() => {
+								sendComment(data.commentId, contentRef.current.value);
+								contentRef.current.value = "";
+							}}
 						>
 							<Send />
 						</IconButton>

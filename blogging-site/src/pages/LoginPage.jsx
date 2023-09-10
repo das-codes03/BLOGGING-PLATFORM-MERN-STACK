@@ -11,12 +11,13 @@ import {
 import axios from "axios";
 import { useRef } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useShowMessage from "./hooks/useShowMessage";
 
 export default function LoginPage() {
 	const nav = useNavigate();
 	const [msgBox, showMessage] = useShowMessage();
+	const [query] = useSearchParams();
 	function login(username, pwd) {
 		axios
 			.post(
@@ -37,7 +38,7 @@ export default function LoginPage() {
 						"auth",
 						JSON.stringify({ token: res.data.token, userId: res.data.userId })
 					);
-					return nav("/");
+					return nav(query.get("from") || "/");
 				}
 			})
 			.catch((err) => {
@@ -47,7 +48,6 @@ export default function LoginPage() {
 						: "Couldn't connect to server. Please check your internet connection and try again!",
 					"error"
 				);
-				console.log(err);
 			});
 	}
 	const userRef = useRef(null);
@@ -122,6 +122,14 @@ export default function LoginPage() {
 										}}
 									>
 										I am new here!
+									</Button>
+									<Button
+										type="button"
+										onClick={() => {
+											nav("/forgotpassword");
+										}}
+									>
+										Forgot password
 									</Button>
 								</Box>
 							</Box>

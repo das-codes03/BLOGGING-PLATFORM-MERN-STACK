@@ -21,11 +21,11 @@ app.use(express.json());
 app.use(cors());
 app.use("/api", api);
 
-// port = process.env.PORT || 3000;
-// app.listen(port, () => {
-// 	console.log(`Server is running on port ${port}`);
-// });
+port = process.env.PORT || 3000;
+app.listen(port, () => {
+	console.log(`Server is running on port ${port}`);
+});
 
-const handler = ServerlessHttp(api);
+// const handler = ServerlessHttp(api);
 
-module.exports = handler;
+// module.exports = handler;

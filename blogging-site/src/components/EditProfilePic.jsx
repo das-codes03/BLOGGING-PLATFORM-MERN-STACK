@@ -22,7 +22,6 @@ export default function EditProfilePic({ src, setData }) {
 	function PreviewImage(url) {
 		const f = url;
 		FileResizer.imageFileResizer(f, 512, 512, "JPEG", 75, 0, (compressed) => {
-			console.log(compressed);
 			setImagePreview(compressed);
 			setData &&
 				setData((d) => {
@@ -65,7 +64,7 @@ export default function EditProfilePic({ src, setData }) {
 							accept="image/*"
 							onChange={(e) => {
 								const f = e.currentTarget.files[0];
-								console.log(f.name);
+
 								PreviewImage(f);
 							}}
 						/>
@@ -73,6 +72,7 @@ export default function EditProfilePic({ src, setData }) {
 					<DialogActions>
 						<Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
 							<Button
+								color="info"
 								onClick={() => {
 									setImageOpen(false);
 								}}
@@ -80,6 +80,7 @@ export default function EditProfilePic({ src, setData }) {
 								Cancel
 							</Button>
 							<Button
+								color="error"
 								onClick={() => {
 									setImagePreview(null);
 									setImageOpen(false);
@@ -87,7 +88,7 @@ export default function EditProfilePic({ src, setData }) {
 										setData((d) => {
 											const data = {
 												...d,
-												newProfilePic: null,
+												newProfilePic: "remove",
 											};
 											return data;
 										});
@@ -147,6 +148,7 @@ export default function EditProfilePic({ src, setData }) {
 				</div>
 			) : (
 				<Button
+					color="info"
 					onClick={() => {
 						setImageOpen(true);
 					}}

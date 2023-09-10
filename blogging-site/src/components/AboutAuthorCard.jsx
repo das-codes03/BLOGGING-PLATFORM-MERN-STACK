@@ -1,7 +1,7 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
 import ProfilePicture from "./ProfilePicture";
 import { useNavigate } from "react-router";
-
+import "../app.css";
 export default function AboutAuthorCard({
 	displayName,
 	bio,
@@ -10,41 +10,44 @@ export default function AboutAuthorCard({
 }) {
 	const nav = useNavigate();
 	return (
-		<Paper
-			sx={{
-				margin: "20px",
-				maxWidth: "1000px",
-				padding: "30px",
-				borderRadius: "30px",
-			}}
-		>
-			<Typography
-				color={"secondary"}
-				marginBottom={"10px"}
-				textAlign={"center"}
-			>
-				About the author
-			</Typography>
+		<Box maxWidth="600px" width="100%">
+			<Paper
+				onClick={() => {
+					nav(`/user/${username}`);
+				}}
+				sx={{
+					margin: "20px",
+					padding: "30px",
 
-			<Box display={"flex"} alignItems={"center"} flexDirection={"column"}>
-				<Box>
-					<ProfilePicture maxHeight={"100px"} src={profilePic} />
+					cursor: "pointer",
+				}}
+			>
+				<Box display={"flex"} alignItems={"center"} flexDirection={"column"}>
+					<Box display={"flex"} alignItems={"center"} flexDirection={"column"}>
+						<Typography marginBottom={"10px"}>About the author</Typography>
+						<Box>
+							<ProfilePicture maxHeight={"100px"} src={profilePic} />
+						</Box>
+						<Typography
+							fontWeight={"bold"}
+							color={"textPrimary"}
+							fontSize={"20px"}
+							fontFamily={"Barlow Condensed"}
+						>
+							{displayName}
+						</Typography>
+						<Typography color={"textSecondary"}>@{username}</Typography>
+						<Typography
+							fontSize={"15px"}
+							fontFamily={"Roboto"}
+							fontWeight={"bold"}
+							marginTop={"20px"}
+						>
+							{bio}
+						</Typography>
+					</Box>
 				</Box>
-				<Box>
-					<Typography color={"primary"} fontSize={"20px"}>
-						{displayName}
-					</Typography>
-					<Typography color={"grey"}>@{username}</Typography>
-					<Typography fontSize={"15px"}>{bio}</Typography>
-					<Button
-						onClick={() => {
-							nav(`/user/${username}`);
-						}}
-					>
-						View Profile
-					</Button>
-				</Box>
-			</Box>
-		</Paper>
+			</Paper>
+		</Box>
 	);
 }
