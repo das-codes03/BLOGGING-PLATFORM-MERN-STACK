@@ -10,7 +10,7 @@
 		"test": "jest"
 	},
 	"engines": {
-		"node": "14.x"
+		"node": "18.x"
 	},
 	"keywords": [],
 	"author": "CJ R. <cj@null.computer> (https://w3cj.now.sh)",
