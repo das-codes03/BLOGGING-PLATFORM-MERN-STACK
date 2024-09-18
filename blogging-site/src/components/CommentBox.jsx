@@ -23,9 +23,10 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-import axios from "axios";
+
 import LikeButton from "./LikeButton";
 import { useEffect, useRef, useState } from "react";
+import axiosConfig from "./AxiosConfig";
 
 export default function CommentBox({ data, onDelete, sendComment }) {
 	const [replyInputOpen, setReplyInput] = useState(false);
@@ -39,9 +40,9 @@ export default function CommentBox({ data, onDelete, sendComment }) {
 			return;
 		}
 
-		axios
+		axiosConfig
 			.get(
-				`http://localhost:3000/api/blogs/${data.blogId}/comments/${data.commentId}/replies`
+				`/blogs/${data.blogId}/comments/${data.commentId}/replies`
 			)
 			.then((res) => {
 				setReplies((reps) => {
@@ -53,7 +54,7 @@ export default function CommentBox({ data, onDelete, sendComment }) {
 		return (
 			<CommentBox
 				data={r}
-				onDelete={() => {}}
+				onDelete={() => { }}
 				key={r.commentId}
 				sendComment={sendComment}
 			/>
@@ -91,12 +92,12 @@ export default function CommentBox({ data, onDelete, sendComment }) {
 					<LikeButton
 						isLiked={data.hasLiked}
 						likeCount={data.likeCount}
-						likeURL={`http://localhost:3000/api/blogs/${data.blogId}/comments/${data.commentId}/like`}
-						unlikeURL={`http://localhost:3000/api/blogs/${data.blogId}/comments/${data.commentId}/unlike`}
+						likeURL={`/blogs/${data.blogId}/comments/${data.commentId}/like`}
+						unlikeURL={`/blogs/${data.blogId}/comments/${data.commentId}/unlike`}
 					/>
 
 					{(JSON.parse(localStorage.getItem("auth")) || {}).userId ===
-					data.userId ? (
+						data.userId ? (
 						<IconButton onClick={onDelete}>
 							<DeleteOutline />
 						</IconButton>

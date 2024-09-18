@@ -89,8 +89,8 @@ export default function BlogCard({ data, cardRef }) {
 					<LikeButton
 						isLiked={data.hasLiked}
 						likeCount={data.likeCount}
-						likeURL={`http://localhost:3000/api/blogs/${data.blogId}/like`}
-						unlikeURL={`http://localhost:3000/api/blogs/${data.blogId}/unlike`}
+						likeURL={`/blogs/${data.blogId}/like`}
+						unlikeURL={`/blogs/${data.blogId}/unlike`}
 					/>
 				</Box>
 			</Box>

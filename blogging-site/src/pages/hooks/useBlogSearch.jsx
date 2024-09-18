@@ -1,5 +1,7 @@
-import axios from "axios";
+
 import { useEffect, useState } from "react";
+import axiosConfig from "../../components/AxiosConfig";
+import axios from "axios";
 
 export default function useBlogSearch(pageno, filterbyuserid) {
 	const [isLoading, setIsLoading] = useState(false);
@@ -16,8 +18,8 @@ export default function useBlogSearch(pageno, filterbyuserid) {
 		if (!isLoading) return;
 		let cancel;
 		setIsLoading(true);
-		axios
-			.get(`http://localhost:3000/api/blogs`, {
+		axiosConfig
+			.get(`/blogs`, {
 				params: {
 					pageno: pageno,
 					perpage: 10,

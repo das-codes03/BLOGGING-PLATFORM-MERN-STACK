@@ -8,20 +8,21 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-import axios from "axios";
+
 import { useRef } from "react";
 
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useShowMessage from "./hooks/useShowMessage";
+import axiosConfig from "../components/AxiosConfig";
 
 export default function LoginPage() {
 	const nav = useNavigate();
 	const [msgBox, showMessage] = useShowMessage();
 	const [query] = useSearchParams();
 	function login(username, pwd) {
-		axios
+		axiosConfig
 			.post(
-				"http://localhost:3000/api/auth/login",
+				"/auth/login",
 				{
 					username: username,
 					password: pwd,

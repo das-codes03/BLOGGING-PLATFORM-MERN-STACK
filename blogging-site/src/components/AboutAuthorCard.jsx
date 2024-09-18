@@ -1,7 +1,7 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
 import ProfilePicture from "./ProfilePicture";
 import { useNavigate } from "react-router";
-import "../app.css";
+// import "..../app.css";
 export default function AboutAuthorCard({
 	displayName,
 	bio,

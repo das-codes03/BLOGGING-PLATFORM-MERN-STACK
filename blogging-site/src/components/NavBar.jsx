@@ -31,7 +31,7 @@ import {
 	useMediaQuery,
 	useTheme,
 } from "@mui/material";
-import axios from "axios";
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import useUserInfo from "../pages/hooks/useUserInfo";
@@ -95,7 +95,7 @@ export default function NavBar({ setDarkMode }) {
 		<>
 			<AppBar
 				position="sticky"
-				// bgcolor={"navbar.light"}
+			// bgcolor={"navbar.light"}
 			>
 				<Container sx={{ padding: "10px" }}>
 					<Toolbar disableGutters>

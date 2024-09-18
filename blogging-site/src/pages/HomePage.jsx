@@ -11,7 +11,7 @@ import {
 import NavBar from "../components/NavBar";
 import BlogCard from "../components/BlogCard";
 import { Search, SearchOff } from "@mui/icons-material";
-import axios from "axios";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import useBlogSearch from "./hooks/useBlogSearch";

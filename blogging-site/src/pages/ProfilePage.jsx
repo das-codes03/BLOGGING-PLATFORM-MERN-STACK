@@ -2,12 +2,13 @@ import { Box, Button, Divider, Typography, useMediaQuery } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import BlogCard from "../components/BlogCard";
 import { useEffect, useState } from "react";
-import axios from "axios";
+
 import EditProfilePic from "../components/EditProfilePic";
 import ProfilePicture from "../components/ProfilePicture";
 import useUserInfo from "./hooks/useUserInfo";
 import BlogSearchSection from "./BlogsSearchSection";
 import { useTheme } from "@emotion/react";
+import axiosConfig from "../components/AxiosConfig";
 
 export default function ProfilePage() {
 	const { username } = useParams();
@@ -15,14 +16,14 @@ export default function ProfilePage() {
 	const { user } = useUserInfo();
 	const nav = useNavigate();
 	useEffect(() => {
-		axios
-			.get(`http://localhost:3000/api/users/${username}`)
+		axiosConfig
+			.get(`/users/${username}`)
 			.then((res) => {
 				setUserInfo(res.data);
 			})
-			.catch(() => {});
+			.catch(() => { });
 	}, []);
-	useEffect(() => {}, [user]);
+	useEffect(() => { }, [user]);
 	const theme = useTheme();
 	const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 	return (

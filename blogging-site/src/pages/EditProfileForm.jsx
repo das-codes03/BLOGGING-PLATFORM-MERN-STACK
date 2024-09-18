@@ -1,12 +1,13 @@
 import { Box, Button, Input, TextField, Typography } from "@mui/material";
-import axios from "axios";
+
 import { useEffect, useRef, useState } from "react";
 import EditProfilePic from "../components/EditProfilePic";
 import useNameValidator from "./hooks/useNameValidator";
 import useShowMessage from "./hooks/useShowMessage";
 import useUserInfo from "./hooks/useUserInfo";
 import { useNavigate } from "react-router";
-import "../app.css";
+import axiosConfig from "../components/AxiosConfig";
+// import "../app.css";
 export default function EditProfileForm() {
 	const { user, isLoading } = useUserInfo();
 	const [editedInfo, setEditedInfo] = useState({});
@@ -17,8 +18,8 @@ export default function EditProfileForm() {
 
 	const [msgBox, showMessage] = useShowMessage();
 	function Update() {
-		axios
-			.patch(`http://localhost:3000/api/users/`, {
+		axiosConfig
+			.patch(`/users/`, {
 				bio: bioRef.current.value,
 				displayName: displayNameRef.current.value,
 				profilePic: editedInfo.newProfilePic,
@@ -38,7 +39,7 @@ export default function EditProfileForm() {
 	}
 
 	const nameValidator = useNameValidator(displayNameRef);
-	function validateInput() {}
+	function validateInput() { }
 	if (isLoading) return null;
 	if (user)
 		return (

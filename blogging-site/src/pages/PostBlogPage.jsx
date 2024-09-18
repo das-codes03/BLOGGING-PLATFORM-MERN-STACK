@@ -22,13 +22,14 @@ import {
 	Typography,
 	useTheme,
 } from "@mui/material";
-import axios from "axios";
+
 import { useEffect, useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useNavigate, useParams } from "react-router";
 import useUserInfo from "./hooks/useUserInfo";
 import useShowMessage from "./hooks/useShowMessage";
+import axiosConfig from "../components/AxiosConfig";
 
 function handleDelete(key, setFields) {
 	setFields((f) => {
@@ -48,7 +49,7 @@ function movePost(index, goDown, setFields) {
 			if (f[i].props.index == index) {
 				if ((i == 0 && !goDown) || (i == f.length - 1 && goDown)) return f;
 				if (!goDown) [f[i - 1], f[i]] = [f[i], f[i - 1]];
-				else [f[i + 1], f[i]] = [f[i], f[i + 1]];
+				else[f[i + 1], f[i]] = [f[i], f[i + 1]];
 				break;
 			}
 		}
@@ -117,8 +118,8 @@ export default function PostBlogPage() {
 	useEffect(() => {
 		const blogId = params.blogId;
 		if (blogId) {
-			axios
-				.get(`http://localhost:3000/api/blogs/${blogId}`)
+			axiosConfig
+				.get(`/blogs/${blogId}`)
 				.then((res) => {
 					console.log(res.data);
 					setData(res.data);
@@ -244,8 +245,8 @@ export default function PostBlogPage() {
 
 						//if post
 						if (!params.blogId) {
-							axios
-								.post("http://localhost:3000/api/blogs", data)
+							axiosConfig
+								.post("/blogs", data)
 								.then((res) => {
 									navigate(`../blogs/${res.data}`);
 								})
@@ -253,9 +254,9 @@ export default function PostBlogPage() {
 									alert("Error: " + e);
 								});
 						} else {
-							axios
+							axiosConfig
 								.put(
-									`http://localhost:3000/api/blogs/${params.blogId}/edit`,
+									`/blogs/${params.blogId}/edit`,
 									data
 								)
 								.then((res) => {

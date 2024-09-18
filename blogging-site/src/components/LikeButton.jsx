@@ -6,10 +6,11 @@ import {
 	LogoDev,
 } from "@mui/icons-material";
 import { IconButton, Typography } from "@mui/material";
-import axios from "axios";
+
 import { useEffect, useRef, useState } from "react";
 import useUserInfo from "../pages/hooks/useUserInfo";
 import LoginDialog from "./LoginDialog";
+import axiosConfig from "./AxiosConfig";
 
 export default function LikeButton({
 	isLiked,
@@ -35,7 +36,7 @@ export default function LikeButton({
 					likeBtnRef.current.disabled = true;
 					if (!user) return setLoginPrompt(true);
 
-					axios
+					axiosConfig
 						.post(likeState ? unlikeURL : likeURL)
 						.then(() => {
 							setIsLiked((l) => {

@@ -1,9 +1,10 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import axios from "axios";
+
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
 // import isEmail from "validator/lib/isemail";
 import useShowMessage from "./hooks/useShowMessage";
+import axiosConfig from "../components/AxiosConfig";
 // import isEmail from "validator/lib/isemail";
 
 export default function ForgotPasswordPage() {
@@ -11,8 +12,8 @@ export default function ForgotPasswordPage() {
 	const [msgbox, showMessage] = useShowMessage();
 	const [isValidEmail, setIsValid] = useState(true);
 	function getLink(email) {
-		axios
-			.post(`http://localhost:3000/api/auth/getresetpasswordlink`, {
+		axiosConfig
+			.post(`/auth/getresetpasswordlink`, {
 				email,
 			})
 			.then((res) => {

@@ -1,9 +1,10 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import axios from "axios";
+
 import { useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useShowMessage from "./hooks/useShowMessage";
 import PasswordValidator from "password-validator";
+import axiosConfig from "../components/AxiosConfig";
 
 export default function ResetPasswordPage() {
 	const [query] = useSearchParams();
@@ -11,8 +12,8 @@ export default function ResetPasswordPage() {
 	const [msgbox, showMessage] = useShowMessage();
 	const navigate = useNavigate();
 	function submit(password, token) {
-		axios
-			.post(`http://localhost:3000/api/auth/resetpassword`, {
+		axiosConfig
+			.post(`/auth/resetpassword`, {
 				token: token,
 				password: password,
 			})

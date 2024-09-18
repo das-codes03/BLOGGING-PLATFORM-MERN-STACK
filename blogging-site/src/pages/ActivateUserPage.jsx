@@ -1,8 +1,9 @@
-import axios from "axios";
+
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router";
 import { useSearchParams } from "react-router-dom";
+import axiosConfig from "../components/AxiosConfig";
 
 export default function ActivateUserPage() {
 	const [query] = useSearchParams();
@@ -12,8 +13,8 @@ export default function ActivateUserPage() {
 	const token = query.get("token");
 	//now activate the account
 	useEffect(() => {
-		axios
-			.post(`http://localhost:3000/api/auth/activate`, { token: `${token}` })
+		axiosConfig
+			.post(`/auth/activate`, { token: `${token}` })
 			.then((res) => {
 				setIsLoading(false);
 				//get the token and set it local storage

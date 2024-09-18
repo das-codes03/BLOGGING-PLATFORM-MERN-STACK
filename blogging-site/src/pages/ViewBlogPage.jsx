@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import CommentBox from "../components/CommentBox";
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+
 import { useNavigate, useParams } from "react-router";
 import LikeButton from "../components/LikeButton";
 import EditProfilePic from "../components/EditProfilePic";
@@ -32,6 +32,7 @@ import AboutAuthorCard from "../components/AboutAuthorCard";
 import useUserInfo from "./hooks/useUserInfo";
 import LoginDialog from "../components/LoginDialog";
 import useShowMessage from "./hooks/useShowMessage";
+import axiosConfig from "../components/AxiosConfig";
 
 function ViewPort({ data }) {
 	return (
@@ -137,14 +138,14 @@ export default function ViewBlogPage() {
 	const { user } = useUserInfo();
 
 	function deleteBlog(id) {
-		axios.delete(`http://localhost:3000/api/blogs/${id}`).then(() => {
+		axiosConfig.delete(`/blogs/${id}`).then(() => {
 			navigate("/");
 		});
 	}
 
 	useEffect(() => {
-		axios
-			.get(`http://localhost:3000/api/blogs/${blogId}`)
+		axiosConfig
+			.get(`/blogs/${blogId}`)
 			.then((e) => {
 				setContent((d) => {
 					return { ...e.data };
@@ -155,14 +156,14 @@ export default function ViewBlogPage() {
 				navigate("/error/blognotfound");
 			});
 
-		axios
-			.get(`http://localhost:3000/api/blogs/${blogId}/comments`)
+		axiosConfig
+			.get(`/blogs/${blogId}/comments`)
 			.then((e) => {
 				setComments(() => {
 					return e.data;
 				});
 			})
-			.catch(() => {});
+			.catch(() => { });
 	}, []);
 	useEffect(() => {
 		if (!response || !user) return;
@@ -185,9 +186,9 @@ export default function ViewBlogPage() {
 	});
 	function sendComment(replyTo, content) {
 		if (!user) return setLoginDialog(true);
-		axios
+		axiosConfig
 			.post(
-				`http://localhost:3000/api/blogs/${blogId}/comments/${replyTo || ""}`,
+				`/blogs/${blogId}/comments/${replyTo || ""}`,
 				{
 					content: content,
 				}
@@ -195,8 +196,8 @@ export default function ViewBlogPage() {
 			.then((res) => {
 				commentRef.current.value = "";
 				console.log(res.data);
-				axios
-					.get(`http://localhost:3000/api/blogs/${blogId}/comments/${res.data}`)
+				axiosConfig
+					.get(`/blogs/${blogId}/comments/${res.data}`)
 					.then((res2) => {
 						if (res2.data.repliedToId) return;
 						setComments((c) => {
@@ -210,8 +211,8 @@ export default function ViewBlogPage() {
 			});
 	}
 	function deleteComment(id) {
-		axios
-			.delete(`http://localhost:3000/api/blogs/${blogId}/comments/${id}`)
+		axiosConfig
+			.delete(`/blogs/${blogId}/comments/${id}`)
 			.then(() => {
 				setComments((c) => {
 					return c.filter((e) => {
@@ -219,7 +220,7 @@ export default function ViewBlogPage() {
 					});
 				});
 			})
-			.catch(() => {});
+			.catch(() => { });
 	}
 	return (
 		<>
@@ -235,13 +236,12 @@ export default function ViewBlogPage() {
 					<LikeButton
 						isLiked={isLiked}
 						likeCount={response.likeCount}
-						likeURL={`http://localhost:3000/api/blogs/${blogId}/like`}
-						unlikeURL={`http://localhost:3000/api/blogs/${blogId}/unlike`}
+						likeURL={`/blogs/${blogId}/like`}
+						unlikeURL={`/blogs/${blogId}/unlike`}
 						onClick={() => {
-							axios
+							axiosConfig
 								.post(
-									`http://localhost:3000/api/blogs/${blogId}/${
-										response.hasLiked ? "unlike" : "like"
+									`/blogs/${blogId}/${response.hasLiked ? "unlike" : "like"
 									}`
 								)
 								.then(() => {

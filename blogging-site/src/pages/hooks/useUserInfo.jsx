@@ -1,5 +1,6 @@
-import axios from "axios";
+
 import { useEffect, useState } from "react";
+import axiosConfig from "../../components/AxiosConfig";
 
 export default function useUserInfo() {
 	const [isLoading, setIsLoading] = useState(true);
@@ -11,7 +12,7 @@ export default function useUserInfo() {
 	// }
 	// Add a common header to every request
 	const token = localStorage.getItem("auth");
-	axios.interceptors.request.use((config) => {
+	axiosConfig.interceptors.request.use((config) => {
 		config.headers["authorization"] = token;
 		return config;
 	});
@@ -22,8 +23,8 @@ export default function useUserInfo() {
 			setUser(false);
 			return;
 		}
-		axios
-			.get(`http://localhost:3000/api/users/me`)
+		axiosConfig
+			.get(`/users/me`)
 			.then((u) => {
 				setUser(() => {
 					setIsLoading(false);

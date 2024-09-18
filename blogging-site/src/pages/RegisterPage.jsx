@@ -7,13 +7,14 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-import axios from "axios";
+
 
 import { useRef, useState } from "react";
 import validator from "validator";
 import useShowMessage from "./hooks/useShowMessage";
 import PasswordValidator from "password-validator";
 import useNameValidator from "./hooks/useNameValidator";
+import axiosConfig from "../components/AxiosConfig";
 export default function RegisterPage() {
 	const nameRef = useRef();
 	const emailRef = useRef();
@@ -116,8 +117,8 @@ export default function RegisterPage() {
 			email: emailRef.current.value,
 			name: nameRef.current.value,
 		};
-		axios
-			.post(`http://localhost:3000/api/auth/register`, data)
+		axiosConfig
+			.post(`/auth/register`, data)
 			.then((res) => {
 				//now go to verification page
 				showMessage(

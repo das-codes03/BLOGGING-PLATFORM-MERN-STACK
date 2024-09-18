@@ -15,7 +15,7 @@ import { Home } from "@mui/icons-material";
 import ProfilePage from "./pages/ProfilePage";
 import "./App.css";
 import RegisterPage from "./pages/RegisterPage";
-import axios from "axios";
+
 import { useEffect, useState } from "react";
 import EditProfileForm from "./pages/EditProfileForm";
 import BlogNotFoundPage from "./pages/errorpages/BlogNotFoundPage";
