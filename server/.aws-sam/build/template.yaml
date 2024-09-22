@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: ''
+Globals:
+  Function:
+    Timeout: 600
+Resources:
+  ExpressApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+  ExpressFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ExpressFunction
+      Handler: src/index.handler
+      Runtime: nodejs20.x
+      MemorySize: 512
+      Events:
+        ExpressFunctionProxy:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExpressApi
+            Path: /{proxy+}
+            Method: ANY
+        ExpressFunctionRoot:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExpressApi
+            Path: /
+            Method: ANY
+    Metadata:
+      SamResourceId: ExpressFunction
+Outputs:
+  ExpressFunctiondApi:
+    Description: API Gateway endpoint URL for Prod stage for Express function
+    Value:
+      Fn::Sub: https://${ExpressApi}.execute-api.${AWS::Region}.amazonaws.com/prod/
+  ExpressFunction:
+    Description: Express Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - ExpressFunction
+      - Arn
+  ExpressFunctionIamRole:
+    Description: Implicit IAM Role created for Express function
+    Value:
+      Fn::GetAtt:
+      - ExpressFunctionRole
+      - Arn
